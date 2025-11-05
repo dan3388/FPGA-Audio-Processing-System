@@ -23,23 +23,30 @@
  */
 
 #include "pico/stdlib.h"
-#include "pico/stdio.h"
-#include "boards.h"
+#include "hardware/adc.h"
 #include "ice_cram.h"
 #include "ice_fpga.h"
-#include "ice_led.h"
-#include "rgb_blink.h"
 
-int main(void) {
-    ice_led_init();
+#define FPGA_BINARY rgb_blink
+
+int main(void) 
+{
+    // initialize FPGA
     ice_fpga_init(FPGA_DATA, 48);
     ice_fpga_start(FPGA_DATA);
 
-    // Write the whole bitstream to the FPGA CRAM
+    // Write the whole bitstream from our SystemVerilog to the FPGA CRAM
     ice_cram_open(FPGA_DATA);
-    ice_cram_write(rgb_blink, sizeof(rgb_blink));
+    ice_cram_write(FPGA_BINARY, sizeof(FPGA_BINARY));
     ice_cram_close();
 
-    while (1);
+    adc_init();
+    adc_gpio_init(41);
+    adc_select_input(1); // ADC1 is GPIO41
+
+    while (true)
+    {
+        // sample and send to iCE40 FPGA for DSP as I2S signal
+    }
     return 0;
 }
