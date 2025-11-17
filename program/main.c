@@ -40,13 +40,15 @@ int main(void)
     ice_cram_write(FPGA_BINARY, sizeof(FPGA_BINARY));
     ice_cram_close();
 
+    spi_init();
+
     adc_init();
     adc_gpio_init(41);
     adc_select_input(1); // ADC1 is GPIO41
 
     while (true)
     {
-        // sample and send to iCE40 FPGA for DSP as I2S signal
+        // sample and send to iCE40 FPGA for DSP as SPI signal
     }
     return 0;
 }
