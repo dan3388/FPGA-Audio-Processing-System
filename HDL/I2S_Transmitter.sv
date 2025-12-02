@@ -33,11 +33,11 @@ module i2s_transmitter
             // sound output
             if (word_select == 0) begin
                 if      (bit_counter == 0)  sound_bit_out <= 0; // I2S has 1 bit delay
-                else if (bit_counter < 13) sound_bit_out <= sound_data[12 - bit_counter];
+                else if (bit_counter < 13) sound_bit_out <= sound_data[11 - bit_counter];
             end
             else begin
                 if      (bit_counter == 13)  sound_bit_out <= 0; // I2S has 1 bit delay
-                else if (bit_counter <= 26)  sound_bit_out <= silence[12 - bit_counter + 13]; // We need to send something equivalent to silence.
+                else if (bit_counter <= 26)  sound_bit_out <= silence[11 - bit_counter + 13]; // We need to send something equivalent to silence.
             end
         end
     end 
