@@ -1,16 +1,16 @@
 module i2s_sound_test
 (
     input  logic reset,
-    input  logic s_clk,
+    input  logic serial_clk,
     output logic word_select,
-    output logic sound_bit_out
-    output reg [5:0] bit_counter; // log_2(34) ~= 6 bits
+    output logic sound_bit_out,
+    // ONLY FOR TESTBENCH –> output reg [5:0] bit_counter // log_2(34) ~= 6 bits
 );
 
     reg [15:0] sound_data;
     reg [15:0] test_sound;
 
-    always_ff @(posedge s_clk or negedge reset) begin
+    always_ff @(posedge serial_clk or negedge reset) begin
         if (!reset) begin
             bit_counter <= 0; // goes to 33 –> 0-33 is 0 through 16 = 16 + 17 more = 0 through 16 + 17 = 33
             sound_data <= 0;
@@ -41,8 +41,8 @@ module i2s_sound_test
             // take in new sound data if we're at the end of the bit_counter
             if (bit_counter == 33) begin
                 sound_data <= test_sound;
-                if (test_sound < 4090) test_sound <= test_sound + 100;
-                else test_sound <= 0;
+                if (test_sound < 4090) test_sound <= test_sound + 150;
+                else test_sound <= 50;
             end; // take new sound data
         end
     end
