@@ -5,14 +5,12 @@ module audio_processor_transceiver
     input  logic spi_chip_select,
     input  logic spi_mosi,
     output logic i2s_ws,
-    output logic i2s_sound_bit_out
+    output logic i2s_sound_bit_out,
+    output logic [5:0] i2s_bit_number
 );
-
-    localparam [11:0] sound_of_silence = 12'd2048;
-    
-    logic [11:0] received_sound;
-    logic [11:0] processed_sound;
-
+    logic [15:0] received_sound;
+    logic [15:0] processed_sound;
+  
     spi_receiver receiver
     (
         .reset(reset),
@@ -32,11 +30,11 @@ module audio_processor_transceiver
     i2s_transmitter i2s_transmitter
     (
         .reset(reset),
-        .silence(sound_of_silence),
         .s_clk(serial_clk),
         .sound_in(processed_sound),
         .word_select(i2s_ws),
-        .sound_bit_out(i2s_sound_bit_out)
+        .sound_bit_out(i2s_sound_bit_out),
+        .bit_counter(i2s_bit_number)
     );
 
 endmodule

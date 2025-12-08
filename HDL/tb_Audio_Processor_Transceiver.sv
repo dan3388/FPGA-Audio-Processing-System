@@ -7,17 +7,16 @@ module tb_audio_processor_transceiver;
     // internal
     logic reset;
     logic serial_clk;
-    logic spi_chip_select;
-    logic spi_mosi;
+    logic spi_chip_select = 1;
+    logic spi_mosi = 0;
 
     // outputs
     wire i2s_ws;
     wire i2s_sound_bit_out;
+    reg [5:0] i2s_bit_number;
 
     // inputs
-    reg [11:0] input_bits;
-    reg [3:0] bit_shift;
-    reg [4:0] i2s_out_bits_counter;
+    reg [15:0] input_bits;
 
     audio_processor_transceiver dut
     (
@@ -26,7 +25,8 @@ module tb_audio_processor_transceiver;
         .spi_chip_select(spi_chip_select),
         .spi_mosi(spi_mosi),
         .i2s_ws(i2s_ws),
-        .i2s_sound_bit_out(i2s_sound_bit_out)
+        .i2s_sound_bit_out(i2s_sound_bit_out),
+        .i2s_bit_number(i2s_bit_number)
     );
 
     initial begin
@@ -35,39 +35,44 @@ module tb_audio_processor_transceiver;
     end
 
     initial begin
-        input_bits = 12'b111111111111;
-        bit_shift = 11;
-        i2s_out_bits_counter = 0;
 
         reset = 0;
         #CLK_PERIOD; // wait for reset to propogate
-        #CLK_PERIOD; // wait for reset to propogate
         reset = 1;
-        $display("\ninput_bits = %b\n", input_bits);
 
         @(negedge serial_clk); // synchronize
         spi_chip_select = 0;
 
-        repeat (12) begin
-            // spi_mosi = (input_bits >> bit_shift) & 1'b1;
-            spi_mosi = 1;
-            bit_shift = bit_shift - 1;
+        repeat (34) begin
             @(negedge serial_clk);
+            spi_mosi = 1;
+            @(posedge serial_clk);
+        end
+        repeat (34) begin
+            @(negedge serial_clk);
+            spi_mosi = !spi_mosi;
+            @(posedge serial_clk);
+        end
+        repeat (34) begin
+            @(negedge serial_clk);
+            spi_mosi = 1;
+            @(posedge serial_clk);
+        end
+        repeat (34) begin
+            @(negedge serial_clk);
+            spi_mosi = !spi_mosi;
+            @(posedge serial_clk);
         end
 
         spi_chip_select = 1;
     end
 
     initial begin
-        i2s_out_bits_counter = 0;
-        wait (spi_chip_select == 1);
-        $display("Now Monitoring I2S output");
-        repeat (26) begin
-            @(posedge serial_clk);
-            if (i2s_out_bits_counter != 0 && i2s_out_bits_counter != 13) begin
-                $display("Bit %0d: %b", i2s_out_bits_counter, i2s_sound_bit_out);
-            end
-            i2s_out_bits_counter += 1;
+        wait (spi_chip_select == 0 && i2s_bit_number == 33);
+        $display("Inputting all ones\n\nNow Monitoring I2S output");
+        repeat (136) begin // cycle through the first wave to get stable signals
+            @(negedge serial_clk);
+            $display("I2S_WS=%b , I2S_Bit_Number=%0d ,  I2S_Sound_Bit=%b", i2s_ws, i2s_bit_number, i2s_sound_bit_out);
         end
 
         spi_chip_select = 0;

@@ -1,39 +1,3 @@
-`timescale 1ns/1ps // Added timescale for clarity
-
-module tb_i2s_transmitter;
-
-    logic rst;
-    logic serial_clk;
-    logic ws;
-    logic sound_bit_out
-    reg [5:0] i2s_bit_number;
-
-    i2s_transmitter uut
-    (
-        .reset(rst),
-        .s_clk(serial_clk),
-        .word_select(ws),
-        .sound_bit_out(sound_bit_out),
-        .bit_counter(i2s_bit_number)
-    );
-
-    initial begin
-        serial_clk = 0;
-        forever #CLK_PERIOD serial_clk = !serial_clk;
-    end
-
-    initial begin
-        wait (ws == 1)
-        wait (ws == 0)
-        repeat (34) begin
-            @(posedge s_clk)
-            $display("I2S_WS=%b , I2S_Bit_Number=%0d ,  I2S_Sound_Bit=%b", ws, i2s_bit_number, sound_bit_out);
-            @(negedge s_clk)
-        end
-    end
-
-endmodule
-
 module i2s_sound_test
 (
     input  logic reset,
