@@ -41,21 +41,21 @@ class Pico_SPI:
         
         self.cs = Pin(cs if cs else 29, Pin.OUT)
         self.spi = SPI(
-            id=id,
+            id,
             baudrate=br,
             polarity=polarity,
             phase=phase,
-            sck=Pin(sck),
-            mosi=Pin(mosi),
-            miso=Pin(miso),
-            cs=cs)
+            sck=sck,
+            mosi=mosi,
+            miso=miso
+        )
         
         self.cs.value(1)
     
     def write_byte(self, data):
-        cs.value(0)
-        self.write(bitarray([data & 0xFF]))
-        cs.value(1)
+        self.cs.value(0) 
+        self.spi.write(bytearray([data & 0xFF]))
+        self.cs.value(1)
         
     def send_data(self, data):
         high = (data >> 8) & 0xFF
@@ -64,11 +64,12 @@ class Pico_SPI:
         write_byte(low)
         
     def stream(self, adc, sr=8000):
+        sample_time = 1000 / sr
         try:
             while True:
                 data = adc.read_raw()
-                write_byte(cs,data)
-                time.sleep()
+                self.write_byte(data)
+                time.sleep(int(sample_time))
         except KeyboardInterrupt:
             print("Done cuz you stopped me")
                 
@@ -82,7 +83,7 @@ MOSI1: GPIO28 -> ICE9
 MISO1: GPIO27 -> ICE18
 CSn1/SSn1: GPIO29 -> ICE11
 '''
-transmitter = Pico_SPI(id=1, br=10000000, polarity=0, phase=0, sck=26 , mosi=28, miso=27, cs=29)
+transmitter = Pico_SPI(id=1, br=10000000, polarity=0, phase=0, sck=26 , mosi=27, miso=28, cs=29)
 while(1):
     transmitter.stream(adc, sr=48000)
     
