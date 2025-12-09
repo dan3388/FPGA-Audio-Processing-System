@@ -4,11 +4,12 @@ module i2s_sound_test
     input  logic serial_clk,
     output logic word_select,
     output logic sound_bit_out,
-    // ONLY FOR TESTBENCH –> output reg [5:0] bit_counter // log_2(34) ~= 6 bits
+    output logic [5:0] bit_counter // log_2(34) ~= 6 bits
 );
 
-    reg [15:0] sound_data;
-    reg [15:0] test_sound;
+    logic [15:0] sound_data;
+    logic [15:0] test_sound;
+    //logic [5:0] bit_counter; // log_2(34) ~= 6 bits
 
     always_ff @(posedge serial_clk or negedge reset) begin
         if (!reset) begin
@@ -16,6 +17,7 @@ module i2s_sound_test
             sound_data <= 0;
             word_select <= 0;
             sound_bit_out <= 0;
+            test_sound <= 0;
         end
         else begin // ALL NON-BLOCKING ASSIGNMENTS ONLY EFFECT LOGIC FOR NEXT CYCLE
             // incrementation
@@ -43,7 +45,7 @@ module i2s_sound_test
                 sound_data <= test_sound;
                 if (test_sound < 4090) test_sound <= test_sound + 150;
                 else test_sound <= 50;
-            end; // take new sound data
+            end // take new sound data
         end
     end
 

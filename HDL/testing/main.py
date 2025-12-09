@@ -2,7 +2,7 @@ import time
 from machine import Pin, SoftI2C, ADC, SPI
 import ice
 
-file = open("bitstream.bin", "br")
+file = open("i2s_sound_test.bin", "br")
 flash = ice.flash(miso=Pin(4), mosi=Pin(7), sck=Pin(6), cs=Pin(5))
 flash.erase(4096) # Optional
 flash.write(file)

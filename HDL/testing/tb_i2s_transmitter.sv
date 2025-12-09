@@ -31,7 +31,7 @@ module tb_i2s_transmitter;
         rst = 1;
         wait (ws == 1)
         wait (ws == 0)
-        repeat (68) begin
+        repeat (700) begin
             @(posedge s_clk);
             $display("I2S_WS=%b , I2S_Bit_Number=%0d ,  I2S_Sound_Bit=%b", ws, i2s_bit_number, sound_bit_out);
             @(negedge s_clk);

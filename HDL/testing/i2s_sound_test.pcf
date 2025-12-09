@@ -1,4 +1,4 @@
-set_io serial_clk        21
-set_io reset             39
-set_io i2s_ws            38
-set_io i2s_sound_bit_out 34
+set_io serial_clk    21
+set_io reset         39
+set_io word_select   38
+set_io sound_bit_out 34
