@@ -19,12 +19,16 @@ I2C_SDA_PIN = Pin(2)
 
 # 2. Define the DAC Reset Pin (Active Low)
 # GPIO10 goes to Reset pin on TLV320DAC3100
-RESET_PIN = Pin(34, OUT)
+RESET_PIN = Pin(34, Pin.OUT)
+RESET_FPGA = Pin(23, Pin.OUT)
 
 # -------------------------------------------------------------
 RESET_PIN.value(1)
-time.sleep(1)
+RESET_FPGA.value(1)
+time.sleep(0.1)
+RESET_FPGA.value(0)
 RESET_PIN.value(0)
+time.sleep(0.1)
 
 # -------------------------------------------------------------
 class Pico_ADC:
@@ -68,8 +72,9 @@ class Pico_SPI:
         self.cs.value(1)
         
     def send_data(self, data):
-        high = (data >> 8) & 0xFF
-        low = data & 0xFF
+        new_data = self.twos_complement(data)
+        high = (new_data >> 8) & 0xFF
+        low = new_data & 0xFF
         self.write_byte(high)
         self.write_byte(low)
 

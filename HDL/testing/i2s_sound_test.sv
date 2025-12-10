@@ -10,7 +10,6 @@ module i2s_sound_test
     logic [15:0] sound_data;
     logic [15:0] test_sound;
     logic [5:0] bit_counter; // log_2(34) ~= 6 bits
-    logic [12:0] square_wave_timer;
     logic [2:0] frame_count;
 
 
@@ -42,7 +41,7 @@ module i2s_sound_test
 
             // left-right channel transitions
             if      (bit_counter == 33) word_select <= 0; // transition to left channel after bit counter 34, which is the last audio bit
-            else if (bit_counter == 16) word_select <= 1; // transition to right channel after bit 16, but counter 17
+            if      (bit_counter == 16) word_select <= 1; // transition to right channel after bit 16, but counter 17
 
             
             // take in new sound data if we're at the end of the bit_counter
