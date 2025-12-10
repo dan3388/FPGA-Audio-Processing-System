@@ -20,7 +20,6 @@ module tb_i2s_transmitter;
     );
 
     initial begin
-        rst = 1;
         s_clk = 0;
         forever #CLK_PERIOD s_clk = !s_clk;
     end
