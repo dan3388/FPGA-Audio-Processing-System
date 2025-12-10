@@ -1,5 +1,5 @@
 import time
-from machine import Pin, SoftI2C, ADC, SPI
+from machine import Pin, I2C, ADC, SPI
 import ice
 
 #Flashing the FPGA with top module code "audio_processor_transceiver.bin"
@@ -19,7 +19,7 @@ I2C_SDA_PIN = Pin(2)
 
 # 2. Define the DAC Reset Pin (Active Low)
 # GPIO10 goes to Reset pin on TLV320DAC3100
-RESET_PIN = Pin(34)
+RESET_PIN = Pin(34, OUT)
 
 # -------------------------------------------------------------
 RESET_PIN.value(1)
@@ -70,8 +70,15 @@ class Pico_SPI:
     def send_data(self, data):
         high = (data >> 8) & 0xFF
         low = data & 0xFF
-        write_byte(high)
-        write_byte(low)
+        self.write_byte(high)
+        self.write_byte(low)
+
+    def twos_complement(self, data):
+        if data >= (2**15):
+            value = data - (1 << 16)
+        else: 
+            value = data
+        return value
         
     def stream(self, adc, sr=8000):
         sample_time = 1000 / sr
