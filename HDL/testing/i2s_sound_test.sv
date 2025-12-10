@@ -3,13 +3,16 @@ module i2s_sound_test
     input  logic reset,
     input  logic serial_clk,
     output logic word_select,
-    output logic sound_bit_out,
-    output logic [5:0] bit_counter // log_2(34) ~= 6 bits
+    output logic sound_bit_out
+    //output logic [5:0] bit_counter // log_2(34) ~= 6 bits
 );
 
     logic [15:0] sound_data;
     logic [15:0] test_sound;
-    //logic [5:0] bit_counter; // log_2(34) ~= 6 bits
+    logic [5:0] bit_counter; // log_2(34) ~= 6 bits
+    logic [12:0] square_wave_timer;
+    logic [2:0] frame_count;
+
 
     always_ff @(posedge serial_clk or negedge reset) begin
         if (!reset) begin
@@ -18,6 +21,7 @@ module i2s_sound_test
             word_select <= 0;
             sound_bit_out <= 0;
             test_sound <= 0;
+            frame_count <= 0;
         end
         else begin // ALL NON-BLOCKING ASSIGNMENTS ONLY EFFECT LOGIC FOR NEXT CYCLE
             // incrementation
@@ -40,11 +44,16 @@ module i2s_sound_test
             if      (bit_counter == 33) word_select <= 0; // transition to left channel after bit counter 34, which is the last audio bit
             else if (bit_counter == 16) word_select <= 1; // transition to right channel after bit 16, but counter 17
 
+            
             // take in new sound data if we're at the end of the bit_counter
             if (bit_counter == 33) begin
                 sound_data <= test_sound;
-                if (test_sound < 4090) test_sound <= test_sound + 150;
-                else test_sound <= 50;
+                if (frame_count == 4) begin
+                    if (test_sound == 16'b0111111111111111) test_sound <= 16'b1111111111111111;
+                    else test_sound <= 16'b0111111111111111;
+                    frame_count <= 0;
+                end
+                else frame_count <= frame_count + 1;
             end // take new sound data
         end
     end

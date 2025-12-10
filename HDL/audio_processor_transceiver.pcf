@@ -1,5 +1,5 @@
-set_io serial_clk        21
-set_io reset             28
+set_io serial_clk        35
+set_io reset             19
 set_io spi_chip_select   11
 set_io spi_mosi          9
 set_io i2s_ws            38
