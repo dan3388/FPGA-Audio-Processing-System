@@ -1,0 +1,99 @@
+module i2s_sound_test
+(
+    input  logic reset,
+    input  logic input_clk, // too fast, must be divided.
+    output logic serial_clk,
+    output logic word_select,
+    output logic sound_bit_out,
+
+    output logic serial_clk_analyzer,
+    output logic input_clk_analyzer,
+    output logic ws_analyzer,
+    output logic sound_bit_analyzer,
+
+    output logic test_LED,
+    output logic test_LED_R,
+    output logic test_LED_G,
+    output logic test_LED_B
+    //output logic [5:0] bit_counter // log_2(34) ~= 6 bits
+);
+
+    logic [3:0] serial_clk_timer;
+
+    logic [15:0] sound_data;
+    logic [15:0] test_sound;
+    logic [5:0] bit_counter; // log_2(34) ~= 6 bits
+    logic [5:0] tone_timer;
+
+    assign sound_bit_analyzer = sound_bit_out;
+    assign ws_analyzer = word_select;
+    assign serial_clk_analyzer = serial_clk;
+    assign input_clk_analyzer = input_clk;
+
+    always_ff @(posedge input_clk or negedge reset) begin
+        if (!reset) begin
+            serial_clk_timer <= 0;
+            serial_clk <= 0;
+        end 
+        else begin
+            // Increment timer
+            serial_clk_timer <= serial_clk_timer + 1;
+            
+            // Toggle clocks when timer rolls over
+            if  (serial_clk_timer == 0)     serial_clk <= !serial_clk; 
+        end
+    end
+
+    always_ff @(posedge serial_clk or negedge reset) begin
+        if (!reset) begin
+            bit_counter <= 31; // goes to 31, for 32 bits total, 16 bits each for left and right channels (right is silent in our case)
+            sound_data <= 0;
+            word_select <= 0;
+            sound_bit_out <= 0;
+            test_sound <= 0;
+            tone_timer <= 0;
+            test_LED <= 1;
+            test_LED_R <= 1;
+            test_LED_G <= 1;
+            test_LED_B <= 1;
+        end
+        // ALL NON-BLOCKING ASSIGNMENTS ONLY EFFECT LOGIC FOR NEXT CYCLE
+        else begin
+            // incrementation
+            if      (bit_counter == 31) bit_counter <= 0;
+            else                        bit_counter <= bit_counter + 1;
+
+            // sound output
+            /* 
+            2 scenarios for left channel audio:
+                bit_counter =  0, WS = 0 –> set to send out MSB       send out bit on bit_counter = 1
+                bit_counter = 15, WS = 1 –> set to send send out LSB  send out bit on bit_counter = 16
+            */
+            if (bit_counter < 16) sound_bit_out <= sound_data[15 - bit_counter];
+            else                  sound_bit_out <= 0;
+
+            // left-right channel transitions
+            // word_select changes 1 bit before the next 16 bit audio sample, thus the LSB of each sample is sent out on the "wrong" word_select value (but this is part of the I2S protocol)
+            if (bit_counter == 31) word_select <= 0; // transition to left channel right before LSB of left-channel audio
+            if (bit_counter == 15) word_select <= 1; // transition to right channel right before LSB of right-channel audio
+
+            // take in new sound data if we're at the end of the bit_counter
+            if (bit_counter == 31) begin
+
+                sound_data <= test_sound;
+
+                tone_timer <= tone_timer + 1;
+
+                if  (tone_timer < 15) test_sound <= 16'b0111110100000000;
+                else                  test_sound <= 16'b1000001100000000;
+            end // take new sound data
+
+            if (bit_counter == 16) begin
+                test_LED_R <= !test_LED_R;
+                test_LED_G <= !test_LED_G;
+                test_LED_B <= !test_LED_B;
+            end
+        end
+    end
+
+endmodule

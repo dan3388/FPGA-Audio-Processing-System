@@ -1,0 +1,15 @@
+set_io input_clk            35
+set_io serial_clk           31
+set_io reset                19
+set_io word_select          9
+set_io sound_bit_out        34
+
+set_io serial_clk_analyzer  25
+set_io input_clk_analyzer   26
+set_io ws_analyzer          23 
+set_io sound_bit_analyzer   21
+
+set_io test_LED             6
+set_io test_LED_R           41
+set_io test_LED_G           39
+set_io test_LED_B           40
