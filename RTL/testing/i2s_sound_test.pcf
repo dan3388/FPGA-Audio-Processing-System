@@ -1,5 +1,6 @@
 set_io input_clk            35
 set_io serial_clk           31
+set_io dac_mclk             28
 set_io reset                19
 set_io word_select          9
 set_io sound_bit_out        34

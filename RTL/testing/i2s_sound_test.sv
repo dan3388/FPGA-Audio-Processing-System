@@ -1,8 +1,9 @@
 module i2s_sound_test
 (
     input  logic reset,
-    input  logic input_clk, // too fast, must be divided.
+    input  logic input_clk, // 12.288 MHz
     output logic serial_clk,
+    output logic dac_mclk,
     output logic word_select,
     output logic sound_bit_out,
 
@@ -15,15 +16,24 @@ module i2s_sound_test
     output logic test_LED_R,
     output logic test_LED_G,
     output logic test_LED_B
-    //output logic [5:0] bit_counter // log_2(34) ~= 6 bits
+
+    // output logic [5:0] bit_counter THIS IS ONLY FOR THE TESTBENCH
 );
 
-    logic [3:0] serial_clk_timer;
+    /*
+    input_clk = dac_mclk = 12.288 MHz
+    serial_clk = 3.072 MHz –> 4 * serial_clk = input_clk
+    sample rate = 48 kHz –> 3.072 MHz / 32 bits / 2 cycles = 48 kHz
+    */
+
+    logic [1:0] serial_clk_timer; // 12.288 MHz / 2^2 = 3.072 MHz
 
     logic [15:0] sound_data;
     logic [15:0] test_sound;
     logic [5:0] bit_counter; // log_2(34) ~= 6 bits
-    logic [5:0] tone_timer;
+    logic [7:0] tone_timer;
+
+    assign dac_mclk = input_clk; // serial_clk = 46.072 MHz, dac_mclk = 4 * serial_clk = 3.072 MHz
 
     assign sound_bit_analyzer = sound_bit_out;
     assign ws_analyzer = word_select;
