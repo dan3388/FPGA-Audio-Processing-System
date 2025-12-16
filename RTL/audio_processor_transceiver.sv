@@ -1,16 +1,26 @@
 module audio_processor_transceiver
 (
     input  logic reset,
-    input  logic serial_clk,
+    input  logic input_clk,
+    
     input  logic spi_chip_select,
     input  logic spi_mosi,
+
+    output logic i2s_serial_clk,
+    output logic i2s_dac_mclk,
     output logic i2s_ws,
     output logic i2s_sound_bit_out,
-    output logic [5:0] i2s_bit_number
+
+    output logic RED_LED,
+    output logic BLUE_LED,
+    output logic GREEN_LED
 );
+
     logic [15:0] received_sound;
     logic [15:0] processed_sound;
   
+    // THIS IS NOT CURRENT, RECEIVER HASN'T BEEN UPDATED SINCE IT WAS FIRST MADE
+    // HASN'T BEEN UPDATED DUE TO NON-CURRENT STATUS
     spi_receiver receiver
     (
         .reset(reset),
@@ -22,7 +32,7 @@ module audio_processor_transceiver
 
     signal_processor DSP
     (
-        .s_clk(serial_clk),
+        .input_clk(input_clk),
         .raw_bits(received_sound),
         .processed_bits(processed_sound)
     );
@@ -30,11 +40,14 @@ module audio_processor_transceiver
     i2s_transmitter i2s_transmitter
     (
         .reset(reset),
-        .s_clk(serial_clk),
-        .sound_in(processed_sound),
+        .input_clk(input_clk),
+        .serial_clk(i2s_serial_clk),
+        .dac_mclk(i2s_dac_mclk),
         .word_select(i2s_ws),
         .sound_bit_out(i2s_sound_bit_out),
-        .bit_counter(i2s_bit_number)
+        .RED_LED(RED_LED),
+        .BLUE_LED(BLUE_LED),
+        .GREEN_LED(GREEN_LED)
     );
 
 endmodule

@@ -1,6 +1,31 @@
-set_io serial_clk        35
+set_io input_clk         35
 set_io reset             19
+
 set_io spi_chip_select   11
 set_io spi_mosi          9
+
+set_io i2s_serial_clk    x
+set_io i2s_dac_mclk      x
 set_io i2s_ws            38
 set_io i2s_sound_bit_out 34
+
+set_io RED_LED           x
+set_io BLUE_LED          x
+set_io GREEN_LED         x
+
+
+    input  logic reset,
+    input  logic input_clk,
+    
+    input  logic spi_chip_select,
+    input  logic spi_mosi,
+
+    output logic i2s_serial_clk,
+    output logic i2s_dac_mclk,
+    output logic i2s_ws,
+    output logic i2s_sound_bit_out,
+    output logic [5:0] i2s_bit_number,
+
+    output logic RED_LED,
+    output logic BLUE_LED,
+    output logic GREEN_LED

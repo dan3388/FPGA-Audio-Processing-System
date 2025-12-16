@@ -31,7 +31,7 @@ module i2s_sound_test
     logic [15:0] sound_data;
     logic [15:0] test_sound;
     logic [5:0] bit_counter; // log_2(34) ~= 6 bits
-    logic [7:0] tone_timer;
+    logic [5:0] tone_timer;
 
     assign dac_mclk = input_clk; // serial_clk = 46.072 MHz, dac_mclk = 4 * serial_clk = 3.072 MHz
 
@@ -80,7 +80,8 @@ module i2s_sound_test
                 bit_counter = 15, WS = 1 –> set to send send out LSB  send out bit on bit_counter = 16
             */
             if (bit_counter < 16) sound_bit_out <= sound_data[15 - bit_counter];
-            else                  sound_bit_out <= 0;
+            else sound_bit_out <= sound_data[15 - bit_counter + 16]; // remove this and replace with the else statement for mono audio
+            //else                  sound_bit_out <= 0;
 
             // left-right channel transitions
             // word_select changes 1 bit before the next 16 bit audio sample, thus the LSB of each sample is sent out on the "wrong" word_select value (but this is part of the I2S protocol)
