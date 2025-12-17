@@ -5,10 +5,10 @@ module spi_receiver
     input  logic chip_select,
     input  logic miso,
     output logic mosi,
-    output logic [15:0] data_out
+    output logic [31:0] data_out
 );
 
-    reg [15:0] shift_reg;
+    reg [31:0] shift_reg;
     reg [5:0] bit_count;
 
     always_ff @(posedge serial_clk or negedge reset) begin
