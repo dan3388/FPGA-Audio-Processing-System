@@ -1,0 +1,11 @@
+set_io input_clk   35
+set_io reset_n     19
+
+set_io spi_cs      11
+set_io spi_mosi    9
+
+set_io dac_pdm_out 28
+
+set_io RED_LED     41
+set_io BLUE_LED    40
+set_io GREEN_LED   39

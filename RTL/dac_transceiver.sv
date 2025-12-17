@@ -1,4 +1,4 @@
-module audio_processor_transceiver
+module dac_transceiver
 (
     input  logic reset_n,     // Changed to active low to match your dac.sv
     input  logic input_clk,   // 12.288 MHz
@@ -8,15 +8,15 @@ module audio_processor_transceiver
 
     // NEW DAC OUTPUT
     output logic dac_pdm_out, // Connect to RC Low Pass Filter
-
-    // Keeping these for internal timing if needed, 
-    // but they are no longer external I2S pins
-    output logic serial_clk,  // 3.072 MHz 
     
     output logic RED_LED,
     output logic GREEN_LED,
     output logic BLUE_LED
 );
+
+    // Keeping these for internal timing if needed, 
+    // but they are no longer external I2S pins
+    logic serial_clk;  // 3.072 MHz 
 
     logic [15:0] received_sound;
     logic [15:0] processed_sound;
