@@ -3,8 +3,7 @@ module audio_processor_transceiver
     input  logic reset,
     input  logic input_clk, // 12.288 MHz
 
-    input  logic spi_miso,
-    output logic spi_mosi,
+    input logic spi_mosi,
     output logic spi_cs,
 
     output logic serial_clk, // 3.072 MHz –> 48 kHz sample rate
@@ -39,7 +38,6 @@ module audio_processor_transceiver
         .reset(reset),
         .serial_clk(serial_clk),
         .chip_select(spi_cs),
-        .miso(spi_miso),
         .mosi(spi_mosi),
         .data_out(received_sound)
     );

@@ -10,7 +10,6 @@ module tb_audio_processor_transceiver;
     logic input_clk_tb;
     logic spi_cs_tb;
     logic i2s_receive_sd_tb;
-    logic spi_miso_tb;
 
     // outputs
     logic serial_clk_tb;
@@ -28,7 +27,6 @@ module tb_audio_processor_transceiver;
         .reset(reset_tb),
         .input_clk(input_clk_tb),
         .spi_mosi(spi_mosi_tb),
-        .spi_miso(spi_miso_tb),
         .spi_cs(spi_cs_tb),
         .serial_clk(serial_clk_tb),
         .i2s_dac_mclk(i2s_dac_mclk_tb),
@@ -52,7 +50,6 @@ module tb_audio_processor_transceiver;
         reset_tb = 1;
 
         spi_mosi_tb = 0;
-        spi_miso_tb = 0;
         spi_cs_tb = 1;
 
         @(negedge serial_clk_tb); // synchronize

@@ -3,9 +3,14 @@ module spi_receiver
     input  logic reset,
     input  logic serial_clk,
     input  logic chip_select,
+<<<<<<< HEAD
     input  logic miso,
     output logic mosi,
     output logic [31:0] data_out
+=======
+    input  logic mosi,
+    output logic [15:0] data_out
+>>>>>>> 8e008466002086fc51a3c4f7af846a95b8d02b10
 );
 
     reg [31:0] shift_reg;
@@ -25,7 +30,7 @@ module spi_receiver
             end
             else begin
                 if (bit_count < 15) begin
-                    shift_reg <= {shift_reg[14:0], miso};
+                    shift_reg <= {shift_reg[14:0], mosi};
                     bit_count <= bit_count + 1;
                 end
                 else if (bit_count == 15) begin
@@ -34,8 +39,8 @@ module spi_receiver
                     data_out <= shift_reg;
                     bit_count <= bit_count + 1;
                     */
-                    shift_reg <= {shift_reg[14:0], miso};
-                    data_out <= {shift_reg[14:0], miso}; // capture the newly shifted-in bit too
+                    shift_reg <= {shift_reg[14:0], mosi};
+                    data_out <= {shift_reg[14:0], mosi}; // capture the newly shifted-in bit too
                     bit_count <= bit_count + 1;
                 end
                 else if (bit_count < 31) begin
