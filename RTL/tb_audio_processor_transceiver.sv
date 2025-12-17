@@ -2,80 +2,95 @@
 
 module tb_audio_processor_transceiver;
 
-    parameter CLK_PERIOD = 5; // Creates a 10ns period (100 MHz frequency)
-
-    // internal
-    logic reset;
-    logic serial_clk;
-    logic spi_chip_select = 1;
-    logic spi_mosi = 0;
-
-    // outputs
-    wire i2s_ws;
-    wire i2s_sound_bit_out;
-    reg [5:0] i2s_bit_number;
+    parameter INPUT_CLK_PERIOD = 5; // Creates a 10ns period (100 MHz frequency)
+    parameter SERIAL_CLK_PERIOD = 20;
 
     // inputs
-    reg [15:0] input_bits;
+    logic reset_tb;
+    logic input_clk_tb;
+    logic spi_cs_tb;
+    logic i2s_receive_sd_tb;
+    logic spi_miso_tb;
+
+    // outputs
+    logic serial_clk_tb;
+    logic i2s_dac_mclk_tb;
+    logic i2s_transmit_ws_tb;
+    logic i2s_transmit_sd_tb;
+    logic [1:0] i2s_transmit_clk_timer_tb;
+    logic [4:0] i2s_transmit_bit_counter_tb;
+    logic RED_LED_tb;
+    logic GREEN_LED_tb;
+    logic BLUE_LED_tb;
 
     audio_processor_transceiver dut
     (
-        .reset(reset),
-        .serial_clk(serial_clk),
-        .spi_chip_select(spi_chip_select),
-        .spi_mosi(spi_mosi),
-        .i2s_ws(i2s_ws),
-        .i2s_sound_bit_out(i2s_sound_bit_out),
-        .i2s_bit_number(i2s_bit_number)
+        .reset(reset_tb),
+        .input_clk(input_clk_tb),
+        .spi_mosi(spi_mosi_tb),
+        .spi_miso(spi_miso_tb),
+        .spi_cs(spi_cs_tb),
+        .serial_clk(serial_clk_tb),
+        .i2s_dac_mclk(i2s_dac_mclk_tb),
+        .i2s_transmit_ws(i2s_transmit_ws_tb),
+        .i2s_transmit_sd(i2s_transmit_sd_tb),
+        .i2s_transmit_bit_counter(i2s_transmit_bit_counter_tb),
+        .RED_LED(RED_LED_tb),
+        .GREEN_LED(GREEN_LED_tb),
+        .BLUE_LED(BLUE_LED_tb)
     );
 
     initial begin
-        serial_clk = 0;
-        forever #CLK_PERIOD serial_clk = !serial_clk;
+        input_clk_tb = 0;
+        forever #INPUT_CLK_PERIOD input_clk_tb = !input_clk_tb;
     end
 
     initial begin
 
-        reset = 0;
-        #CLK_PERIOD; // wait for reset to propogate
-        reset = 1;
+        reset_tb = 0;
+        #SERIAL_CLK_PERIOD; // wait for reset to propogate
+        reset_tb = 1;
 
-        @(negedge serial_clk); // synchronize
-        spi_chip_select = 0;
+        spi_mosi_tb = 0;
+        spi_miso_tb = 0;
+        spi_cs_tb = 1;
 
-        repeat (34) begin
-            @(negedge serial_clk);
-            spi_mosi = 1;
-            @(posedge serial_clk);
+        @(negedge serial_clk_tb); // synchronize
+        spi_cs_tb = 0;
+
+        repeat (32) begin
+            @(negedge serial_clk_tb);
+            spi_mosi_tb = 1;
+            @(posedge serial_clk_tb);
         end
-        repeat (34) begin
-            @(negedge serial_clk);
-            spi_mosi = !spi_mosi;
-            @(posedge serial_clk);
+        repeat (32) begin
+            @(negedge serial_clk_tb);
+            spi_mosi_tb = 1;
+            @(posedge serial_clk_tb);
         end
-        repeat (34) begin
-            @(negedge serial_clk);
-            spi_mosi = 1;
-            @(posedge serial_clk);
+        repeat (32) begin
+            @(negedge serial_clk_tb);
+            spi_mosi_tb = 1;
+            @(posedge serial_clk_tb);
         end
-        repeat (34) begin
-            @(negedge serial_clk);
-            spi_mosi = !spi_mosi;
-            @(posedge serial_clk);
+        repeat (32) begin
+            @(negedge serial_clk_tb);
+            spi_mosi_tb = 1;
+            @(posedge serial_clk_tb);
         end
 
-        spi_chip_select = 1;
+        spi_cs_tb = 1;
     end
 
     initial begin
-        wait (spi_chip_select == 0 && i2s_bit_number == 33);
+        wait (spi_cs_tb == 0 && i2s_transmit_bit_counter_tb == 33);
         $display("Inputting all ones\n\nNow Monitoring I2S output");
         repeat (136) begin // cycle through the first wave to get stable signals
-            @(negedge serial_clk);
-            $display("I2S_WS=%b , I2S_Bit_Number=%0d ,  I2S_Sound_Bit=%b", i2s_ws, i2s_bit_number, i2s_sound_bit_out);
+            @(negedge serial_clk_tb);
+            $display("I2S_WS=%b , I2S_Bit_Number=%0d ,  I2S_SD=%b", i2s_transmit_ws_tb, i2s_transmit_bit_counter_tb, i2s_transmit_sd_tb);
         end
 
-        spi_chip_select = 0;
+        spi_cs_tb = 0;
 
         $display("Do these match?\n\n=== Testbench complete ===\n\n");
         $finish;
