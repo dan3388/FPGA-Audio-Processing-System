@@ -3,15 +3,15 @@ module spi_receiver
     input  logic reset,
     input  logic serial_clk,
     input  logic chip_select,
-    input logic mosi,
-    output logic [15:0] data_out,
-    output logic [15:0] shift_reg_out // this is only for verification purposes
+    input  logic mosi,
+    output logic [15:0] data_out
+    //output logic [15:0] shift_reg_out // this is only for verification purposes
 );
 
     reg [15:0] shift_reg;
     reg [5:0] bit_count;
 
-    assign shift_reg_out = shift_reg;
+    //assign shift_reg_out = shift_reg; // this is only for verification purposes
 
     always_ff @(posedge serial_clk or negedge reset) begin
         if (!reset) begin

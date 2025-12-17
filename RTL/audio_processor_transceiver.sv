@@ -3,21 +3,22 @@ module audio_processor_transceiver
     input  logic reset,
     input  logic input_clk, // 12.288 MHz
 
-    input logic spi_mosi,
-    input logic spi_cs,
+    input  logic spi_mosi,
+    input  logic spi_cs,
 
     output logic serial_clk, // 3.072 MHz –> 48 kHz sample rate
 
     output logic i2s_dac_mclk,
-    output logic i2s_transmit_ws,
-    output logic i2s_transmit_sd,
-    output logic [4:0] i2s_transmit_bit_counter, // ONLY FOR TESTBENCH
+    output logic i2s_ws,
+    output logic i2s_sd,
 
     output logic RED_LED,
-    output logic BLUE_LED,
-    output logic GREEN_LED
-);
+    output logic GREEN_LED,
+    output logic BLUE_LED
 
+    // verification outputs:
+    //output logic [4:0] i2s_bit_counter // Only for verification
+);
     /*
     input_clk = dac_mclk = 12.288 MHz
     serial_clk = 3.072 MHz –> 4 * serial_clk = input_clk
@@ -28,9 +29,9 @@ module audio_processor_transceiver
     logic [15:0] processed_sound;
 
     logic [1:0] serial_clk_timer;
-    // logic [4:0] i2s_transmit_bit_counter; // for real use
+    // logic [4:0] i2s_bit_counter; // for real use
 
-    assign i2s_dac_mclk = input_clk; // serial_clk = 46.072 MHz, dac_mclk = 4 * serial_clk = 3.072 MHz
+    //assign i2s_dac_mclk = input_clk; // serial_clk = 46.072 MHz, dac_mclk = 4 * serial_clk = 3.072 MHz
 
     // Instantiations
     spi_receiver receiver
@@ -54,9 +55,9 @@ module audio_processor_transceiver
         .reset(reset),
         .sound_in(processed_sound),
         .serial_clk(serial_clk),
-        .word_select(i2s_transmit_ws),
-        .sound_bit_out(i2s_sound_bit_out),
-        .bit_counter(i2s_transmit_bit_counter)
+        .word_select(i2s_ws),
+        .sound_bit_out(i2s_sd)
+        //.bit_counter_out(i2s_bit_counter)
     );
 
     always_ff @(posedge input_clk or negedge reset) begin

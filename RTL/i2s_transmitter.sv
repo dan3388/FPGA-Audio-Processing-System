@@ -2,11 +2,11 @@ module i2s_transmitter
 (
     input  logic reset,
     input  logic [15:0] sound_in,
-    input logic serial_clk,
+    input  logic serial_clk,
     
     output logic word_select,
-    output logic sound_bit_out,
-    output logic [4:0] bit_counter // log_2(32) = 5 bits
+    output logic sound_bit_out
+    //output logic [4:0] bit_counter_out // This is only for verification
 );
 
     /*
@@ -15,6 +15,9 @@ module i2s_transmitter
     */
 
     logic [15:0] sound_data;
+    logic [4:0] bit_counter;
+
+    //assign bit_counter_out = bit_counter; // this is only for verification
 
     always_ff @(posedge serial_clk or negedge reset) begin
         if (!reset) begin
