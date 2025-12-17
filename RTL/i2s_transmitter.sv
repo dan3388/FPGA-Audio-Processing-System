@@ -2,16 +2,14 @@ module i2s_transmitter
 (
     input  logic reset,
     input  logic [15:0] sound_in,
+    input logic serial_clk,
     
-    output logic serial_clk,
-    output logic dac_mclk,
     output logic word_select,
     output logic sound_bit_out,
     output logic [4:0] bit_counter // log_2(32) = 5 bits
 );
 
     /*
-    dac_mclk = 12.288 MHz
     serial_clk = 3.072 MHz –> 4 * serial_clk = input_clk
     sample rate = 48 kHz –> 3.072 MHz / 32 bits / 2 cycles = 48 kHz
     */

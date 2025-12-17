@@ -1,31 +1,43 @@
 import time
-from machine import Pin, I2C
+from machine import Pin, I2C, ADC, SPI  
 import ice
 
+#------------------------------ Pin Definitions -----------------------
 DAC_ADDR = 0x18
-
+# I2C for DAC
 sda_pin = Pin(2, Pin.OUT, Pin.PULL_UP)
 scl_pin = Pin(3, Pin.OUT, Pin.PULL_UP)
 
+# LED Pins
 GREEN_LED = Pin(0, Pin.OUT)
 RED_LED = Pin(1, Pin.OUT)
 RED_LED.value(1)
 GREEN_LED.value(1)
 
+# FPGA Reset Function
+def reset_fpga():
+    FPGA_RESET = Pin(23 , Pin.OUT)
+    FPGA_RESET.value(0)
+    time.sleep(1)
+    FPGA_RESET.value(1)
+
+
+#-------------------------------- I2C Setup -------------------------
 # Initialize I2C
 i2c = I2C(1, scl=scl_pin, sda=sda_pin, freq=100000) # SCL max clk frequency is 100 kHz in "standard" mode
 
-print("Scanning I2C bus...")
-devices = i2c.scan()
+def debug_I2C():
+    print("Scanning I2C bus...")
+    devices = i2c.scan()
 
-if len(devices) == 0:
-    print("No I2C devices found! Check your wiring and pull-up resistors.")
-else:
-    print(f"I2C devices found: {len(devices)}")
-    for device in devices:
-        print(f"Decimal address: {device} | Hex address: {hex(device)}")
+    if len(devices) == 0:
+        print("No I2C devices found! Check your wiring and pull-up resistors.")
+    else:
+        print(f"I2C devices found: {len(devices)}")
+        for device in devices:
+            print(f"Decimal address: {device} | Hex address: {hex(device)}")
 
-print("i2c initialized")
+    print("i2c initialized")
 
 # Helper function to write a register
 def write_reg(reg, val_bin):
@@ -118,24 +130,73 @@ def init_dac_i2s_slave():
     
     print("DAC Configured for I2S Slave. Start your I2S stream now.")
 
-# Run it
-init_dac_i2s_slave()
+#----------------------------- Pico ADC  -----------------------------
+class Pico_ADC:
+    def __init__(self, pin_num):
+        self.adc = ADC(pin_num)
+    
+    def read_raw(self):
+        return self.adc.read_u16()
+    
+#----------------------------- Pico SPI ------------------------------
+class Pico_SPI:
+    def __init__(
+        self,
+        id=1,
+        br: int = 1536000,
+        polarity: int = 0,
+        phase: int = 0,
+        sck:int | None = None,
+        mosi:int | None = None,
+        miso:int | None = None,
+        cs:int | None = None
+    ):
+        
+        self.cs = Pin(cs if cs else 29, Pin.OUT)
+        self.cs.value(1)  # Deselect the device
 
+        self.spi = SPI(
+            id,
+            baudrate=br,
+            polarity=polarity,
+            phase=phase,
+            sck=sck,
+            mosi=mosi,
+            miso=miso
+        )
 
-FPGA_RESET = Pin(23 , Pin.OUT)
+        # Pre-allocate buffers
+        self.data_buffer = bytearray(2) 
+        self.silence_buffer = bytearray([0x00, 0x00]) # 16 bits of silence
+    
+    def __send_data(self, data):
+        new_data = self.twos_complement(data)
+        high = (new_data >> 8) & 0xFF
+        low = new_data & 0xFF
 
-FPGA_RESET.value(0)
-time.sleep(1)
-FPGA_RESET.value(1)
+        self.data_buffer[0] = high
+        self.data_buffer[1] = low
+        
+        self.cs.value(0)  # Select the device
+        self.spi.write(self.data_buffer)
+        self.spi.write(self.silence_buffer)  # Send silence to Right Channel
+        self.cs.value(1)  # Deselect the device
 
+    def twos_complement(self, data):
+        if data >= (2**15):
+            value = data - (1 << 16)
+        else: 
+            value = data
+        return value
+        
+    def stream(self, adc, sr=48000):
+        actual_sr = self.spi.baudrate / 32
+        print(f"Starting SPI Stream at ~{actual_sr} Hz (Target: {sr} Hz)")
+        while True:
+            data = adc.read_raw()
+            self.__send_data(data)
 
-
-# Define the DAC Reset Pin (Active Low)
-# GPIO10 goes to Reset pin on TLV320DAC3100
-#RESET_PIN = Pin(34, Pin.OUT)
-# -------------------------------------------------------------
-
-
+#------------------ Flash FPGA with I2S Sound Test Bitfile -----------------------
 file = open("i2s_sound_test.bin", "br")
 flash = ice.flash(miso=Pin(4), mosi=Pin(7), sck=Pin(6), cs=Pin(5))
 flash.erase(4096) # Optional
@@ -144,9 +205,22 @@ flash.write(file)
 fpga = ice.fpga(cdone=Pin(40), clock=Pin(21), creset=Pin(31), cram_cs=Pin(5), cram_mosi=Pin(4), cram_sck=Pin(6), frequency=12.288)
 fpga.start()
 
-#i2c.writeto_mem(DAC_ADDR, 0, bytes([0b00000000])) # choose page 0
-#flags = i2c.readfrom_mem(DAC_ADDR, 37, 1)
-#print((flags))
-#if flags == bytes([0b10100000]):
 RED_LED.value(0)
 GREEN_LED.value(0)  
+
+#------------------ Start Streaming Audio via I2S ------------------------
+adc = Pico_ADC(41)
+debug_I2C()
+init_dac_i2s_slave()
+reset_fpga()
+'''
+SPI1 Pins:
+SCK1: GPIO26 -> ICE21
+MOSI1: GPIO28 -> ICE9
+MISO1: GPIO27 -> ICE18
+CSn1/SSn1: GPIO29 -> ICE11
+'''
+transmitter = Pico_SPI(id=1, br=3072000, polarity=0, phase=0, sck=26 , mosi=27, miso=28, cs=29)
+while(1):
+    transmitter.stream(adc, sr=48000)
+    time.sleep(1)
