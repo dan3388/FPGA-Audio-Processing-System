@@ -4,10 +4,7 @@ set_io reset             19
 set_io spi_cs            11
 set_io spi_mosi          9
 
-set_io serial_clk        31
-set_io i2s_dac_mclk      28
-set_io i2s_ws            38
-set_io i2s_sd 34
+dac_out                  28
 
 set_io RED_LED           41
 set_io BLUE_LED          40
