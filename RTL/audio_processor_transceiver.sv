@@ -4,7 +4,7 @@ module audio_processor_transceiver
     input  logic input_clk, // 12.288 MHz
 
     input logic spi_mosi,
-    output logic spi_cs,
+    input logic spi_cs,
 
     output logic serial_clk, // 3.072 MHz –> 48 kHz sample rate
 

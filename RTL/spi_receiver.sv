@@ -3,18 +3,15 @@ module spi_receiver
     input  logic reset,
     input  logic serial_clk,
     input  logic chip_select,
-<<<<<<< HEAD
-    input  logic miso,
-    output logic mosi,
-    output logic [31:0] data_out
-=======
-    input  logic mosi,
-    output logic [15:0] data_out
->>>>>>> 8e008466002086fc51a3c4f7af846a95b8d02b10
+    input logic mosi,
+    output logic [15:0] data_out,
+    output logic [15:0] shift_reg_out // this is only for verification purposes
 );
 
-    reg [31:0] shift_reg;
+    reg [15:0] shift_reg;
     reg [5:0] bit_count;
+
+    assign shift_reg_out = shift_reg;
 
     always_ff @(posedge serial_clk or negedge reset) begin
         if (!reset) begin
@@ -24,6 +21,7 @@ module spi_receiver
             data_out <= 0;
         end
         else begin
+            // Active low chip select
             if (chip_select) begin
                 bit_count <= 0;
                 shift_reg <= 0;
@@ -34,14 +32,14 @@ module spi_receiver
                     bit_count <= bit_count + 1;
                 end
                 else if (bit_count == 15) begin
-                    /*
-                    shift_reg <= {shift_reg[14:0], miso}; // added when getting test bench to show the right thing
+                    
+                    shift_reg <= {shift_reg[14:0], mosi}; // added when getting test bench to show the right thing
                     data_out <= shift_reg;
                     bit_count <= bit_count + 1;
-                    */
-                    shift_reg <= {shift_reg[14:0], mosi};
-                    data_out <= {shift_reg[14:0], mosi}; // capture the newly shifted-in bit too
-                    bit_count <= bit_count + 1;
+                
+                    // shift_reg <= {shift_reg[14:0], miso};
+                    // data_out <= {shift_reg[14:0], miso}; // capture the newly shifted-in bit too
+                    // bit_count <= bit_count + 1;
                 end
                 else if (bit_count < 31) begin
                     bit_count <= bit_count + 1;

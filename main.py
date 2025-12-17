@@ -1,19 +1,3 @@
-'''
-    
-#--------------------------------------------------------------
-adc = Pico_ADC(41)
-\'''
-SPI1 Pins:
-SCK1: GPIO26 -> ICE21
-MOSI1: GPIO28 -> ICE9
-MISO1: GPIO27 -> ICE18
-CSn1/SSn1: GPIO29 -> ICE11
-\'''
-transmitter = Pico_SPI(id=1, br=10000000, polarity=0, phase=0, sck=26 , mosi=27, miso=28, cs=29)
-while(1):
-    transmitter.stream(adc, sr=48000)
-'''
-
 import time
 from machine import Pin, I2C, ADC, SPI  
 import ice
@@ -159,7 +143,7 @@ class Pico_SPI:
     def __init__(
         self,
         id=1,
-        br: int = 1536000,
+        br: int = 3072000,
         polarity: int = 0,
         phase: int = 0,
         sck:int | None = None,
@@ -206,7 +190,7 @@ class Pico_SPI:
         return value
         
     def stream(self, adc, sr=48000):
-        actual_sr = self.spi.baudrate / 32
+        actual_sr = 3072000 / 32
         print(f"Starting SPI Stream at ~{actual_sr} Hz (Target: {sr} Hz)")
         while True:
             data = adc.read_raw()
@@ -226,6 +210,7 @@ GREEN_LED.value(0)
 
 #------------------ Start Streaming Audio via I2S ------------------------
 adc = Pico_ADC(41)
+#debug_I2C()
 init_dac_i2s_slave()
 reset_fpga()
 '''
@@ -239,3 +224,4 @@ transmitter = Pico_SPI(id=1, br=3072000, polarity=0, phase=0, sck=26 , mosi=27, 
 while(1):
     transmitter.stream(adc, sr=48000)
     time.sleep(1)
+
