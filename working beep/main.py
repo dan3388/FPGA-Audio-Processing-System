@@ -134,15 +134,15 @@ def init_dac_beep():
 
     print("DAC Initialized. Beep should be playing on SPEAKER and HEADPHONES.")
 
-# Run it
-init_dac_beep()
-
 
 FPGA_RESET = Pin(23 , Pin.OUT)
 
 FPGA_RESET.value(0)
 time.sleep(1)
 FPGA_RESET.value(1)
+
+# Run it
+init_dac_beep()
 
 
 
