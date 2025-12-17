@@ -1,43 +1,22 @@
 module i2s_transmitter
 (
     input  logic reset,
-    input  logic input_clk, // 12.288 MHz
+    input  logic [15:0] sound_in,
     
     output logic serial_clk,
     output logic dac_mclk,
     output logic word_select,
     output logic sound_bit_out,
-    output logic [5:0] bit_counter, // log_2(34) ~= 6 bits
-
-    output logic test_LED_R,
-    output logic test_LED_G,
-    output logic test_LED_B
+    output logic [4:0] bit_counter // log_2(32) = 5 bits
 );
 
     /*
-    input_clk = dac_mclk = 12.288 MHz
+    dac_mclk = 12.288 MHz
     serial_clk = 3.072 MHz –> 4 * serial_clk = input_clk
     sample rate = 48 kHz –> 3.072 MHz / 32 bits / 2 cycles = 48 kHz
     */
 
-    logic [1:0] serial_clk_timer; // 12.288 MHz / 2^2 = 3.072 MHz
     logic [15:0] sound_data;
-
-    assign dac_mclk = input_clk; // serial_clk = 46.072 MHz, dac_mclk = 4 * serial_clk = 3.072 MHz
-
-    always_ff @(posedge input_clk or negedge reset) begin
-        if (!reset) begin
-            serial_clk_timer <= 0;
-            serial_clk <= 0;
-        end 
-        else begin
-            // Increment timer
-            serial_clk_timer <= serial_clk_timer + 1;
-            
-            // Toggle clocks when timer rolls over
-            if  (serial_clk_timer == 0)     serial_clk <= !serial_clk; 
-        end
-    end
 
     always_ff @(posedge serial_clk or negedge reset) begin
         if (!reset) begin
@@ -45,9 +24,6 @@ module i2s_transmitter
             sound_data <= 0;
             word_select <= 0;
             sound_bit_out <= 0;
-            test_LED_R <= 1;
-            test_LED_G <= 1;
-            test_LED_B <= 1;
         end
         else begin // ALL NON-BLOCKING ASSIGNMENTS ONLY EFFECT LOGIC FOR NEXT CYCLE
             // incrementation
@@ -71,10 +47,6 @@ module i2s_transmitter
 
             // take in new sound data if we're at the end of the bit_counter
             if (bit_counter == 31) sound_data <= sound_in; // take new sound data
-
-            test_LED_R <= !test_LED_R;
-            test_LED_G <= !test_LED_G;
-            test_LED_B <= !test_LED_B;
         end
     end 
 
