@@ -1,8 +1,11 @@
 set_io input_clk   35
 set_io reset_n     19
 
+
 set_io spi_cs      11
 set_io spi_mosi    9
+set_io spi_miso    18
+set_io spi_done    25   
 
 set_io dac_pdm_out 28
 

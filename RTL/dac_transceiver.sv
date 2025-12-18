@@ -5,6 +5,8 @@ module dac_transceiver
 
     input  logic spi_mosi,
     input  logic spi_cs,
+    output logic spi_miso,
+    output logic spi_done,
 
     // NEW DAC OUTPUT
     output logic dac_pdm_out, // Connect to RC Low Pass Filter
@@ -30,6 +32,8 @@ module dac_transceiver
         .chip_select(spi_cs),
         .mosi(spi_mosi),
         .data_out(received_sound)
+        .miso(spi_miso)
+        .done(spi_done)
     );
 
     // 2. Signal Processor: Volume, EQ, etc.
