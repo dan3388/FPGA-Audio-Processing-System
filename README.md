@@ -35,5 +35,43 @@ The output of our sound will need to be converted back to analog so it can be pl
 
 
 ## Our implementation
-## 
+## AI & Sources:
+
+Our use of AI was mainly for debugging within VSCode Github Copilot. There were other cases where asking AI was useful like what protocols to use or explaining how something works from another code example found online.
+
+### Prompts: 
+> Is sending a digital signal through SPI from Rp2350 to fpga the best option? 
+
+>  explain this code to me:
+
+    // Run test I2C commands for the sake of testing the FPGA communication over I2C
+    for (uint8_t tx = 0;; tx++) {
+
+        uint8_t buf[1] = {tx};
+
+        printf("i2c scan:");
+
+
+        for (int i = 0x00; i < 0x7f; i++) {
+
+            ret = i2c_write_blocking(APP_I2C, i, buf, sizeof(buf), false);
+
+            if (ret >= 0) {
+
+                printf(" 0x%02x", i);
+
+            }
+
+
+            sleep_us(100);
+
+        }
+
+        printf("\n");
+
+
+        sleep_ms(1);
+
+    } 
+
 ## Conclusion
