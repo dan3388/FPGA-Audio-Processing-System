@@ -83,7 +83,7 @@ Our use of AI was mainly for debugging within VSCode Github Copilot. There were 
         sleep_ms(1);
     } 
 ### Sources
-- https://www.digikey.com/en/maker/tutorials/2023/what-is-the-i2s-communication-protocol
+- https://www.allaboutcircuits.com/technical-articles/introduction-to-the-i2s-interface/
 - https://www.ti.com/lit/ds/symlink/tlv320dac3100.pdf
 - https://github.com/adafruit/Adafruit_TLV320_I2S
 - https://www.analog.com/en/resources/analog-dialogue/articles/introduction-to-spi-interface.html
