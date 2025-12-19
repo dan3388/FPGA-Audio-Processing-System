@@ -82,7 +82,13 @@ Our use of AI was mainly for debugging within VSCode Github Copilot. There were 
 
         sleep_ms(1);
     } 
-
+### Sources
+- https://www.digikey.com/en/maker/tutorials/2023/what-is-the-i2s-communication-protocol
+- https://www.ti.com/lit/ds/symlink/tlv320dac3100.pdf
+- https://github.com/adafruit/Adafruit_TLV320_I2S
+- https://www.analog.com/en/resources/analog-dialogue/articles/introduction-to-spi-interface.html
+- https://www.youtube.com/watch?v=7IbD4DDS5UA
+- https://forum.digilent.com/topic/9096-fpga-audio-adc-and-dac/
 ## How to compile for the Pico2-Ice
 Compilation of this project for the pico2-ice is relatively simple. Below is the series of commands from OSS-CAD-SUITE to compile for the pico2-Ice, but one can also use the make file for "Working Square Wave"
 ```
