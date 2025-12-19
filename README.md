@@ -14,7 +14,7 @@ Fall Quarter 2025
 
 Using the Pico2-Ice development kit, our primary objective was to design a guitar effects pedal using the iCE40 FPGA. This project applies core principles of digital logic and hardware description languages learned in our Digital Design course to real-time signal processing.
 
-Due to time constraints and a burnt out I2S DAC, this project was largely unable to move past test-benching, although I2S transmission was tested and verified as functional.
+Due to time constraints and a burnt out I2S DAC, this project was largely unable to move past test bench verification, although I2S transmission was both verified and tested IRL.
 
 
 ## System Overview
