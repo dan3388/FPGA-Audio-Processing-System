@@ -9,20 +9,35 @@ ENGR433 - Walla Walla University
 Fall Quarter 2025
 
 --- 
-## Goals of this Project
 
-Using the Pico2-Ice development kit, our initial goal was to use the ICE40 FGPA to create a guitar sounds effect pedal. Using the principles learned in the Digital Design class. 
-## Overview
+## Project Goals
 
-### DPS
+Using the Pico2-Ice development kit, our primary objective was to design a guitar effects pedal using the iCE40 FPGA. This project applies core principles of digital logic and hardware description languages learned in our Digital Design course to real-time signal processing.
 
-The guitar sounds effect pedal is essentially a Digital Sound Processor (DPS). Our DPS would take a signal data, in our case sound coming from a guitar, and alter it with a set function to then be transmitter out and played. 
 
-### ADC+SPI
+## System Overview
 
-To get sound from the a guitar and into the FPGA, the data needs to be amplified and converted from analog to digital so that the FPGA can manipulate it. The Raspberry Pi Pico2 (rp2350B) in our dev-kit, has a built-in Analog-to-Digital converter that takes in 0-3.3V analog data and converts it to 12-bit digital. The sound from the guitar would need to be amplified since the pick-up from a guitar ranges from 12mV to 500mV. 
+### DSP (Digital Signal Processing)
 
-Serial Peripheral Interface (SPI) would the be used to transmit the raw data from the raspberry pi pico2 to the FPGA. For its simplicity and reliability in transmission, SPI is the best option.
+The core of this system is a Digital Signal Processor (DSP). The DSP intercepts the raw signal from the guitar, applies a mathematical function to alter the audio data (the "effect"), and transmits the modified signal to the output stage for playback.
+
+### ADC & SPI (Input Stage)
+
+To process guitar audio within an FPGA, the signal must first be amplified and converted from analog to digital.
+
+1. Preamplification: Since guitar pickups produce a low-level signal (ranging from 100mV to 500mV), the audio must be amplified to a level suitable for the ADC.
+
+1. Conversion: We utilized the built-in Analog-to-Digital Converter (ADC) on the Raspberry Pi Pico 2 (RP2350B). This ADC samples the 0–3.3V analog signal and converts it into a 12-bit digital signal. We converted this unsigned 12-bit signal to a signed 16-bit signal
+
+1. Transmission: We chose the Serial Peripheral Interface (SPI) protocol to bridge the Pico 2 and the FPGA. SPI provides a simple, high-speed, and reliable method for streaming raw 12-bit samples into the iCE40 for processing.
+
+### I2S & DAC (Output Stage)
+
+Once processed, the digital audio must be converted back into an analog waveform for playback.
+
+Hardware: We used the TLV320DAC3100 (an I2S-based DAC).
+
+Control & Data: The DAC is initialized and configured via the I2C protocol. Once configured, it receives the processed 12-bit digital signal from the FPGA via the Inter-IC Sound (I2S) protocol and outputs the final analog audio to a speaker or headphones.
 
 ### I2S+DAC
 
