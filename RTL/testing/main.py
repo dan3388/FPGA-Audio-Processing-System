@@ -7,6 +7,15 @@ DAC_ADDR = 0x18
 sda_pin = Pin(2, Pin.OUT, Pin.PULL_UP)
 scl_pin = Pin(3, Pin.OUT, Pin.PULL_UP)
 
+DAC_RESET = Pin(34, Pin.OUT)
+time.sleep(0.1)
+DAC_RESET.value(1)
+time.sleep(0.1)
+DAC_RESET.value(0)
+time.sleep(0.1)
+DAC_RESET.value(1)
+time.sleep(0.1)
+
 GREEN_LED = Pin(0, Pin.OUT)
 RED_LED = Pin(1, Pin.OUT)
 RED_LED.value(1)

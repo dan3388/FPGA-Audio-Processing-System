@@ -14,36 +14,35 @@ Fall Quarter 2025
 
 Using the Pico2-Ice development kit, our primary objective was to design a guitar effects pedal using the iCE40 FPGA. This project applies core principles of digital logic and hardware description languages learned in our Digital Design course to real-time signal processing.
 
+Due to time constraints and a burnt out I2S DAC, this project was largely unable to move past test-benching, although I2S transmission was tested and verified as functional.
+
 
 ## System Overview
 
-### DSP (Digital Signal Processing)
 
-The core of this system is a Digital Signal Processor (DSP). The DSP intercepts the raw signal from the guitar, applies a mathematical function to alter the audio data (the "effect"), and transmits the modified signal to the output stage for playback.
+### ~~DSP (Digital Signal Processing)~~
+
+~~The core of this system is a Digital Signal Processor (DSP). The DSP intercepts the raw signal from the guitar, applies a mathematical function to alter the audio data (the "effect"), and transmits the modified signal to the output stage for playback.~~
+
 
 ### ADC & SPI (Input Stage)
 
 To process guitar audio within an FPGA, the signal must first be amplified and converted from analog to digital.
 
-1. Preamplification: Since guitar pickups produce a low-level signal (ranging from 100mV to 500mV), the audio must be amplified to a level suitable for the ADC.
+1. **Preamplification:** Since guitar pickups produce a low-level signal (ranging from 100mV to 500mV), the audio must be amplified to a level suitable for the ADC.
 
-1. Conversion: We utilized the built-in Analog-to-Digital Converter (ADC) on the Raspberry Pi Pico 2 (RP2350B). This ADC samples the 0–3.3V analog signal and converts it into a 12-bit digital signal. We converted this unsigned 12-bit signal to a signed 16-bit signal
+2. **A–>D Conversion:** We utilized the built-in Analog-to-Digital Converter (ADC) on Pico2-Ice's RP2350B chip. This ADC samples the 0–3.3V analog signal and converts it into a 12-bit digital signal. We converted this unsigned 12-bit signal to a signed 16-bit signal for SPI transmission.
 
-1. Transmission: We chose the Serial Peripheral Interface (SPI) protocol to bridge the Pico 2 and the FPGA. SPI provides a simple, high-speed, and reliable method for streaming raw 12-bit samples into the iCE40 for processing.
+1. **MCU–>FPGA Transmission:** We chose the Serial Peripheral Interface (SPI) protocol to bridge the Pico 2 and the FPGA. SPI provides a simple, high-speed, and reliable method for streaming raw 12-bit samples into the iCE40 for processing.
 
 ### I2S & DAC (Output Stage)
 
 Once processed, the digital audio must be converted back into an analog waveform for playback.
 
-Hardware: We used the TLV320DAC3100 (an I2S-based DAC).
+1. **Digital Transmission**: We transmitted the audio from the Ice40 by implementing an I2S transmitter in the Ice40.
 
-Control & Data: The DAC is initialized and configured via the I2C protocol. Once configured, it receives the processed 12-bit digital signal from the FPGA via the Inter-IC Sound (I2S) protocol and outputs the final analog audio to a speaker or headphones.
+2. **D–>A Conversion:** We used the TLV320DAC3100 I2S DAC board made by adafruit to convert the I2S transmitted by the FPGA into an analog signal.
 
-### I2S+DAC
-
-The output of our sound will need to be converted back to analog so it can be played. We used the TLV320DAC3100 I2S DAC from Adafruit. This DA, after being programmed using I2C protocol, would take the digital signal from the FPGA using I2S and output it from a speaker or headphone. 
-
-[I2S stuff goes here]
 
 
 
@@ -52,7 +51,7 @@ The output of our sound will need to be converted back to analog so it can be pl
 ## Our implementation
 ## AI & Sources:
 
-Our use of AI was mainly for debugging within VSCode Github Copilot. There were other cases where asking AI was useful like what protocols to use or explaining how something works from another code example found online.
+Our use of AI was mainly for debugging within VSCode Github Copilot. There were other cases where asking AI was useful to determine what protocols to use or explaining code found online.
 
 ### Prompts: 
 > Is sending a digital signal through SPI from Rp2350 to fpga the best option? 
