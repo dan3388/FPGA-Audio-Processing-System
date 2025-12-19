@@ -40,6 +40,17 @@ Once processed, the digital audio must be converted back into an analog waveform
 
 
 ## Our implementation
+
+### Challenges:
+Hardware Configuration & Software Integration The most significant obstacle was establishing a reliable interface between the FPGA and the TLV320DAC3100 board. The DAC requires specific initialization via I2C to configure its internal signal paths and gain settings. Initially, we attempted to use standard CircuitPython and Arduino libraries as recommended by Adafruit; however, these high-level abstractions led to persistent communication errors. To resolve this, we performed a deep dive into the TLV320DAC3100 datasheet. By manually mapping the device's internal registers, we were able to write a custom configuration sequence that met our specific requirements.
+
+Scope and Circuit Complexity Managing the project's scope proved challenging. Converting a raw guitar signal into digital data required more complex circuitry than initially anticipated, specifically regarding pre-amplification. To ensure system stability, we prioritized the integrity of the input (ADC) and output (DAC) stages. Consequently, we implemented a "pass-through" architecture for the DSP logic—where the digital input is routed directly to the output without modification—to verify the signal chain before attempting complex sound effects.
+
+### Our results
+While the individual modules showed promising results during testbench simulations and hardware verification with oscilloscopes, we were unable to achieve a fully integrated test.
+
+During the final stages of hardware integration, a circuit failure resulted in a short-circuit on the DAC board. This hardware malfunction prevented us from performing an end-to-end acoustic test. Despite this setback, our verification process confirmed that the FPGA was correctly receiving and transmitting data, providing a solid framework for future iterations of this design. 
+
 ## AI & Sources:
 
 Our use of AI was mainly for debugging within VSCode Github Copilot. There were other cases where asking AI was useful to determine what protocols to use or explaining code found online.
