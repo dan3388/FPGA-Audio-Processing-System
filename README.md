@@ -19,12 +19,6 @@ Due to time constraints and a burnt out I2S DAC, this project was largely unable
 
 ## System Overview
 
-
-### ~~DSP (Digital Signal Processing)~~
-
-~~The core of this system is a Digital Signal Processor (DSP). The DSP intercepts the raw signal from the guitar, applies a mathematical function to alter the audio data (the "effect"), and transmits the modified signal to the output stage for playback.~~
-
-
 ### ADC & SPI (Input Stage)
 
 To process guitar audio within an FPGA, the signal must first be amplified and converted from analog to digital.
@@ -45,9 +39,6 @@ Once processed, the digital audio must be converted back into an analog waveform
 
 
 
-
-
-
 ## Our implementation
 ## AI & Sources:
 
@@ -56,39 +47,39 @@ Our use of AI was mainly for debugging within VSCode Github Copilot. There were 
 ### Prompts: 
 > Is sending a digital signal through SPI from Rp2350 to fpga the best option? 
 
->  explain this code to me:
+> explain this code to me:
 
     // Run test I2C commands for the sake of testing the FPGA communication over I2C
-    for (uint8_t tx = 0;; tx++) {
-
+    for (uint8_t tx = 0;; tx++) 
+    {
         uint8_t buf[1] = {tx};
 
         printf("i2c scan:");
-
 
         for (int i = 0x00; i < 0x7f; i++) {
 
             ret = i2c_write_blocking(APP_I2C, i, buf, sizeof(buf), false);
 
             if (ret >= 0) {
-
                 printf(" 0x%02x", i);
-
             }
 
-
             sleep_us(100);
-
         }
 
         printf("\n");
 
-
         sleep_ms(1);
-
     } 
 
 ## How to compile for the Pico2-Ice
-Compilation of this project for the pico2-ice is relatively simple. Below is the series of commands from OSS-CAD-SUITE to compile for the pico2-Ice:
+Compilation of this project for the pico2-ice is relatively simple. Below is the series of commands from OSS-CAD-SUITE to compile for the pico2-Ice, but one can also use the make file for "Working Square Wave"
+```
+yosys -p "synth_ice40 -top i2s_sound_test -json i2s_sound_test.json" i2s_sound_test.sv
+
+nextpnr-ice40 --up5k --package sg48 --pcf $(PCF) --json i2s_sound_test.json --asc i2s_sound_test.asc
+
+icepack i2s_sound_test.asc i2s_sound_test.bin
+```
 
 ## Conclusion
