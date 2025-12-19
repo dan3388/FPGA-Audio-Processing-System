@@ -88,4 +88,7 @@ Our use of AI was mainly for debugging within VSCode Github Copilot. There were 
 
     } 
 
+## How to compile for the Pico2-Ice
+Compilation of this project for the pico2-ice is relatively simple. Below is the series of commands from OSS-CAD-SUITE to compile for the pico2-Ice:
+
 ## Conclusion
