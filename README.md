@@ -98,5 +98,3 @@ nextpnr-ice40 --up5k --package sg48 --pcf $(PCF) --json i2s_sound_test.json --as
 
 icepack i2s_sound_test.asc i2s_sound_test.bin
 ```
-
-## Conclusion
